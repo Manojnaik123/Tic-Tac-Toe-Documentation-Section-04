@@ -343,3 +343,5 @@ export default App
 
 ```
 
+<h2>Prefer Computed Values & Avoid Unnecessary State</h2>
+go through video once lec no 84 
