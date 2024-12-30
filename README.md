@@ -51,3 +51,86 @@ On the other hand, images that are used inside of components should typically be
 
 Here we have tow instances of the player component. Both will hanve independent function.
 
+<h2> Best Practice: Updating State Based On Old State Correctly</h2>
+
+In react when updating state based on the previous value of that state 
+Do not do like this 
+
+```jsx
+  function handleEditClick() {
+        setIsEditing(!isEditing);
+    }
+```
+The problem with this code is that react behind the scenes is scheduling those state updates <br>
+This state update is not performed instantly but scheduled by react to perform in future <br>
+
+<h3>For example</h3> 
+
+```jsx
+    const [isEditing, setIsEditing] = useState(false);
+
+    function handleEditClick() {
+        setIsEditing(!isEditing);
+        setIsEditing(!isEditing);
+    }
+```
+This above code if we see the first setIsEditing() will set isEditing to true then the second function will set the isEditing to false.<br>
+This means that there no use of this function. But this is not the case because of scheduling the code will not work as we intend
+
+<h3>For example optimal way for the above code is</h3>
+
+```jsx
+  function handleEditClick() {
+        setIsEditing((editing)=> !editing);
+        setIsEditing((editing)=> !editing);
+    }
+```
+This code will work as we intend 
+
+<h3> This is the way we should update state based on old value</h3>
+
+```jsx
+  function handleEditClick() {
+        setIsEditing((editing)=> !editing);
+    }
+```
+
+This is strongly recommended by the react team
+
+This is done because the arrow function we pass in the setIsEditing() will get the current state value 
+
+<h2>User Input 2 way binding</h2>
+
+Here we have used two way binding for the input using state playerName<br>
+
+```jsx
+import { useState } from 'react';
+
+export default function Player({ initialName, symbol }) {
+    const [playerName, setPlayerName ] = useState(initialName);
+    const [isEditing, setIsEditing] = useState(false);
+
+    function handleEditClick() {
+        setIsEditing((editing)=> !editing);
+    }
+
+    function handleOnChange(event){
+        setPlayerName(event.target.value);
+    }
+
+    let editablePlayerName = <span className="player-name">{playerName}</span>;
+
+    if(isEditing){
+        editablePlayerName = <input onChange={handleOnChange} type='text' required value={playerName}/>
+    }
+
+    return <li>
+        <span className="player">
+            {editablePlayerName}
+            <span className="player-symbol">{symbol}</span>
+        </span>
+        <button onClick={handleEditClick}>{isEditing? "Save": "Edit"}</button>
+    </li>
+}
+```
+
