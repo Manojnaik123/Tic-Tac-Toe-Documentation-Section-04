@@ -238,3 +238,108 @@ export default function GameBoard() {
 <h1>Lifting State Up [Core Concept]</h1>
 
 <p>lifting up state refers to the process of moving state from one component to a common parent component so that it can be shared between sibling or child components. This approach is crucial for managing state effectively in scenarios where multiple components need access to the same data.</p>
+
+For Example<br>
+
+GameBoard.jsx
+```jsx
+import { useState } from "react";
+
+const initialGameBoard = [
+    [null, null, null],
+    [null, null, null],
+    [null, null, null]
+]
+
+export default function GameBoard({ onSelectSquare, activePlayerSymbol }) {
+    const [gameBoard, setGameBoard] = useState(initialGameBoard);
+
+    function handleSelectSquare(rowIndex, columnIndex) {
+        setGameBoard((prevGameBoard) => {
+            const updatedBoard = [...prevGameBoard.map(innerArray => [...innerArray])];
+            updatedBoard[rowIndex][columnIndex] = activePlayerSymbol;
+            return updatedBoard;
+        });
+        onSelectSquare();
+    }
+
+    return <ol id="game-board">
+        {gameBoard.map((row, rowIndex) =>
+            <li key={rowIndex}>
+                <ol>
+                    {row.map((playerSymbol, columnIndex) =>
+                        <li key={columnIndex}>
+                            <button onClick={() => handleSelectSquare(rowIndex, columnIndex)}>{playerSymbol}</button>
+                        </li>)}
+                </ol>
+            </li>)}
+    </ol>
+
+}
+```
+
+Player.jsx
+
+```jsx
+import { useState } from 'react';
+
+export default function Player({ initialName, symbol, isActive }) {
+    const [playerName, setPlayerName] = useState(initialName);
+    const [isEditing, setIsEditing] = useState(false);
+
+    function handleEditClick() {
+        setIsEditing((editing) => !editing);
+    }
+
+    function handleOnChange(event) {
+        setPlayerName(event.target.value);
+    }
+
+    let editablePlayerName = <span className="player-name">{playerName}</span>;
+
+    if (isEditing) {
+        editablePlayerName = <input onChange={handleOnChange} type='text' required value={playerName} />
+    }
+
+    return <li className={isActive ? 'active' : undefined}>
+        <span className="player">
+            {editablePlayerName}
+            <span className="player-symbol">{symbol}</span>
+        </span>
+        <button onClick={handleEditClick}>{isEditing ? "Save" : "Edit"}</button>
+    </li>
+}
+```
+
+These both Gameboard.jsx and Playeer.jsx require a single state for updation of the content. <br>
+So in this case the sate can be lifted to nearest most parent component. The parent Component is App.jsx 
+
+App.jsx 
+
+```jsx 
+import Player from "./Components/Player";
+import GameBoard from "./Components/GameBoard";
+import { useState } from 'react';
+
+function App() {
+  const [activePlayer, setActivePlayer] = useState('X');
+
+  function handleSelectSquare() {
+    setActivePlayer((currentActivePlayer) => currentActivePlayer === "X" ? "O" : "X"); // here state upade is done with the use of previous state so using arraw functions 
+    console.log(activePlayer);
+  }
+
+  return <main>
+    <div id="game-container" >
+      <ol id="players" className="highlight-player">
+        <Player initialName="Player 1" symbol="X" isActive={activePlayer === 'X'} />
+        <Player initialName="Player 2" symbol="O" isActive={activePlayer === 'O'} />
+      </ol>
+      <GameBoard onSelectSquare={handleSelectSquare} activePlayerSymbol={activePlayer} />
+    </div>
+  </main>
+}
+export default App
+
+```
+
