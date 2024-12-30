@@ -349,3 +349,12 @@ ol {
     transform: scale(1);
   }
 }
+
+.square{
+  display: flex;
+  flex-direction: column;
+}
+
+.row{
+  display: flex;
+}

@@ -1,13 +1,20 @@
-import Player from "./Components/Player"
+import Player from "./Components/Player";
+import GameBoard from "./Components/GameBoard";
+import {useState} from 'react';
 
 function App() {
+  const [] = useState();
   return <main>
     <div id="game-container">
       <ol id="players">
-        <Player initialName="Player 1" symbol="X"/>
-        <Player initialName="Player 2" symbol="O"/>
+        <Player initialName="Player 1" symbol="X" />
+        <Player initialName="Player 2" symbol="O" />
       </ol>
+      <GameBoard />
     </div>
+
+    
+
   </main>
 }
 export default App

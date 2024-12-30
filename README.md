@@ -133,4 +133,108 @@ export default function Player({ initialName, symbol }) {
     </li>
 }
 ```
+<h2>Rendering multi-dimentional Lists</h2>
 
+```jsx 
+const initialGameBoard = [
+    [null, null, null],
+    [null, null, null],
+    [null, null, null]
+]
+
+export default function GameBoard() {
+    return <ol id="game-board">
+        {initialGameBoard.map((row, rowIndex) =>
+            <li key={rowIndex}>
+                <ol>
+                    {row.map((playerSymbol, columnIndex) =>
+                        <li key={columnIndex}>
+                            <button>{playerSymbol}</button>
+                        </li>)}
+                </ol>
+            </li>)}
+    </ol>
+
+}
+```
+<h2>Best Practice: Updating Object State Immutably</h2>
+When state is an object or an array (which are reference type) then we should update that state in an imuatable way. <br>
+This means we should create a deep copy first then update it.<br>
+This practice is recommended by the react team. 
+Reason for this is scheduling it can impact our output. 
+
+Here we are mutating the old state itself using setGameBoard() react team advise aganist it. 
+
+```jsx
+import { useState } from "react";
+
+const initialGameBoard = [
+    [null, null, null],
+    [null, null, null],
+    [null, null, null]
+]
+
+export default function GameBoard() {
+    const [gameBoard, setGameBoard] = useState(initialGameBoard);
+
+    function handleSelectSquare(rowIndex, columnIndex){
+        setGameBoard((prevGameBoard)=> {
+            prevGameBoard[rowIndex][columnIndex] = 'X';
+            return prevGameBoard;
+        });
+    }
+
+    return <ol id="game-board">
+        {initialGameBoard.map((row, rowIndex) =>
+            <li key={rowIndex}>
+                <ol>
+                    {row.map((playerSymbol, columnIndex) =>
+                        <li key={columnIndex}>
+                            <button>{playerSymbol}</button>
+                        </li>)}
+                </ol>
+            </li>)}
+    </ol>
+
+}
+```
+
+Instead take a deep copy and then update the state 
+```jsx
+import { useState } from "react";
+
+const initialGameBoard = [
+    [null, null, null],
+    [null, null, null],
+    [null, null, null]
+]
+
+export default function GameBoard() {
+    const [gameBoard, setGameBoard] = useState(initialGameBoard);
+
+    function handleSelectSquare(rowIndex, columnIndex){
+        setGameBoard((prevGameBoard)=> {
+            const updatedBoard = [...prevGameBoard.map(innerArray => [...innerArray])];
+            updatedBoard[rowIndex][columnIndex] = 'X';
+            return updatedBoard;
+        });
+    }
+
+    return <ol id="game-board">
+        {initialGameBoard.map((row, rowIndex) =>
+            <li key={rowIndex}>
+                <ol>
+                    {row.map((playerSymbol, columnIndex) =>
+                        <li key={columnIndex}>
+                            <button>{playerSymbol}</button>
+                        </li>)}
+                </ol>
+            </li>)}
+    </ol>
+
+}
+```
+
+<h1>Lifting State Up [Core Concept]</h1>
+
+<p>lifting up state refers to the process of moving state from one component to a common parent component so that it can be shared between sibling or child components. This approach is crucial for managing state effectively in scenarios where multiple components need access to the same data.</p>
